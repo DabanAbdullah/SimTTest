@@ -566,15 +566,7 @@ a{color:var(--accent)}
 [data-theme="dark"] .dt tbody tr:hover td{background:rgba(91,127,255,.07)}
 [data-theme="dark"] .adt tbody tr:hover td{background:rgba(91,127,255,.06)}
 
-/* ─── LEAFLET ────────────────────────────────────────── */
-.leaflet-container{font-family:var(--sans)}
-.leaflet-control-attribution{font-size:8px!important;opacity:.4}
-.leaflet-popup-content-wrapper{
-  border-radius:14px!important;box-shadow:var(--sh-md)!important;
-  border:1px solid var(--border);padding:0!important;overflow:hidden
-}
-.leaflet-popup-content{margin:0!important}
-.leaflet-popup-tip-container{display:none}
+/* ─── POPUP CARDS (city/building detail) ─────────────── */
 .lp{padding:16px 20px;font-family:var(--sans);min-width:380px}
 .lp-city{font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px}
 .lp-country{font-size:10px;color:var(--text3);margin-bottom:10px}
@@ -588,7 +580,6 @@ a{color:var(--accent)}
 .lp-btn{width:100%;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s}
 .lp-btn:hover{background:#3451d1}
 /* City / Building lightbox popups */
-.leaflet-popup-content-wrapper{border-radius:14px!important;padding:0!important;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.1)!important;}
 .lp{padding:16px 20px;font-family:var(--sans);min-width:380px}
 .lp-city-card,.lp-building-card{padding:0;overflow:hidden;}
 .lp-city-header{transition:background .2s;}
@@ -1389,9 +1380,9 @@ body{background:var(--bg)}
 </div>
 
 <!-- VENDOR LIBS via CDN -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.3/chart.umd.min.js"></script>
+<script src="xlsx.full.min.js"></script>
+
+<script src="chart.min.js"></script>
 <!-- APP SCRIPTS — local, in this folder -->
 <script src="analytics.js"></script>
 <!-- PRO ENHANCEMENT LAYER — wraps render(), adds advanced charts + motion. Must load AFTER analytics.js -->
