@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SIM EOS Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Syne:wght@700;800&display=swap"/>
+<!-- Bootstrap 5 via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+<style>
+/* ═══════════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════════ */
+:root {
+  --bg:        #f1f3f4;
+  --surface:   #ffffff;
+  --surface2:  #f8f9fa;
+  --surface3:  #f1f3f4;
+  --border:    #e0e3e7;
+  --border2:   #c4c9d0;
+  --accent:    #1a73e8;   /* Material Blue 600 */
+  --accent-lt: #e8f0fe;
+  --accent2:   #1e8e3e;   /* Material Green 600 */
+  --accent2-lt:#e6f4ea;
+  --warn:      #f9ab00;   /* Material Amber 600 */
+  --warn-lt:   #fef7e0;
+  --danger:    #d93025;   /* Material Red 600 */
+  --danger-lt: #fce8e6;
+  --purple:    #8430ce;   /* Material Deep Purple 600 */
+  --purple-lt: #f3e8fd;
+  --teal:      #00acc1;   /* Material Cyan 600 */
+  --teal-lt:   #e0f7fa;
+  --pink:      #d01884;   /* Material Pink 600 */
+  --pink-lt:   #fde7f3;
+  --s1:#d93025;--s2:#e8710a;--s3:#f9ab00;--s4:#1e8e3e;--s5:#80868b;
+  --text:      #202124;   /* Material grey 900 */
+  --text2:     #3c4043;   /* Material grey 800 */
+  --text3:     #5f6368;   /* Material grey 700 — readable secondary */
+  --sans:      'Plus Jakarta Sans',-apple-system,sans-serif;
+  --mono:      'JetBrains Mono','Fira Code',monospace;
+  --display:   'Syne',system-ui,sans-serif;
+  --r:14px; --r-sm:8px; --r-xs:5px;
+  --sh-xs:0 1px 2px rgba(60,64,67,.06);
+  --sh-sm:0 1px 3px rgba(60,64,67,.12),0 1px 2px rgba(60,64,67,.08);
+  --sh:   0 2px 6px rgba(60,64,67,.15),0 1px 3px rgba(60,64,67,.10);
+  --sh-md:0 4px 12px rgba(60,64,67,.18),0 2px 6px rgba(60,64,67,.10);
+  --sh-lg:0 12px 32px rgba(60,64,67,.24),0 4px 12px rgba(60,64,67,.12);
+  --topbar-h:62px;
+}
+
+[data-theme="dark"] {
+  --bg:        #202124;   /* Material dark background */
+  --surface:   #2d2e30;
+  --surface2:  #35363a;
+  --surface3:  #3c4043;
+  --border:    #44474a;
+  --border2:   #5f6368;
+  --accent:    #8ab4f8;   /* Material Blue 300 */
+  --accent-lt: #1f3047;
+  --accent2:   #81c995;   /* Material Green 300 */
+  --accent2-lt:#1c3324;
+  --warn:      #fdd663;   /* Material Yellow 300 */
+  --warn-lt:   #3a3000;
+  --danger:    #f28b82;   /* Material Red 300 */
+  --danger-lt: #3c1f1c;
+  --purple:    #c58af9;   /* Material Purple 300 */
+  --purple-lt: #2a1c3d;
+  --teal:      #4dd0e1;   /* Material Cyan 300 */
+  --teal-lt:   #0c2a30;
+  --pink:      #ff8bcb;   /* Material Pink 300 */
+  --pink-lt:   #3a1228;
+  --text:      #e8eaed;   /* Material grey 200 */
+  --text2:     #bdc1c6;   /* Material grey 400 */
+  --text3:     #9aa0a6;   /* Material grey 500 — readable on dark */
+  --sh-xs:0 1px 2px rgba(0,0,0,.35);
+  --sh-sm:0 2px 8px rgba(0,0,0,.4);
+  --sh:   0 4px 20px rgba(0,0,0,.45);
+  --sh-md:0 8px 36px rgba(0,0,0,.52);
+  --sh-lg:0 20px 60px rgba(0,0,0,.62);
+}
+
+/* ─── RESET ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+a{color:var(--accent)}
+
+/* ─── LOAD SCREEN ────────────────────────────────────── */
+#load-screen{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px
+}
+.ls-amz-mark{
+  width:84px;height:84px;border-radius:24px;
+  background:linear-gradient(145deg,#232f3e,#131921);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--sh-md),0 0 0 1px rgba(255,153,0,.15)
+}
+.ls-title{font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-.03em}
+.ls-chip{
+  background:linear-gradient(135deg,#1a73e8,#7c3aed);color:#fff;
+  border-radius:7px;padding:3px 9px;font-size:10px;font-weight:700;
+  font-family:var(--mono);letter-spacing:.05em
+}
+.ls-ftag{padding:3px 9px;border-radius:5px;font-weight:700;font-family:var(--mono)}
+.ls-ftag.json{background:var(--accent-lt);color:var(--accent);border:1px solid rgba(26,115,232,.2)}
+.ls-ftag.xlsx{background:var(--accent2-lt);color:var(--accent2);border:1px solid rgba(30,142,62,.2)}
+
+/* ─── SHELL ──────────────────────────────────────────── */
+.shell{display:flex;flex-direction:column;min-height:100vh}
+
+/* ─── TOPBAR ─────────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:200;
+  background:rgba(255,255,255,.88);backdrop-filter:blur(24px) saturate(1.8);
+  border-bottom:1px solid var(--border);box-shadow:var(--sh-sm);
+  height:var(--topbar-h);padding:0 24px;
+  display:flex;align-items:center;gap:18px;flex-shrink:0
+}
+[data-theme="dark"] .topbar{background:rgba(17,24,38,.9)}
+.t-logo{display:flex;align-items:center;gap:10px;white-space:nowrap;flex-shrink:0}
+.t-logo-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(145deg,#232f3e,#131921);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--sh-xs),0 0 0 1px rgba(255,153,0,.12);flex-shrink:0
+}
+.t-logo-name{font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.02em}
+.t-logo-sub{font-size:10px;color:var(--text3);font-weight:500;margin-top:1px}
+.t-vr{width:1px;height:30px;background:var(--border);flex-shrink:0}
+.t-stats{display:flex;align-items:center;gap:20px}
+.t-stat{display:flex;flex-direction:column;align-items:center}
+.t-stat-val{font-size:17px;font-weight:800;font-family:var(--mono);line-height:1;letter-spacing:-.02em}
+.t-stat-val.danger{color:var(--danger)}
+.t-stat-lbl{font-size:9px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+#tb-date-notice{
+  font-size:10px;color:var(--warn);font-family:var(--mono);
+  background:var(--warn-lt);border:1px solid rgba(249,171,0,.2);
+  border-radius:5px;padding:2px 8px;white-space:nowrap
+}
+#file-status-bar{display:none;align-items:center;gap:8px;padding:0 4px}
+.fsb-item{
+  display:flex;align-items:center;gap:5px;font-size:10px;
+  font-family:var(--mono);font-weight:600;padding:4px 10px;
+  border-radius:20px;white-space:nowrap;transition:all .2s
+}
+.fsb-item.loaded{background:var(--accent2-lt);color:var(--accent2);border:1px solid rgba(30,142,62,.25)}
+.fsb-item.unloaded{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.t-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+
+/* ─── BUTTONS ─────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 15px;
+  border-radius:var(--r-sm);font-family:var(--sans);font-size:12px;
+  font-weight:600;cursor:pointer;border:1px solid transparent;
+  transition:all .15s;line-height:1.4;white-space:nowrap;text-decoration:none
+}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 10px rgba(26,115,232,.35)}
+.btn-primary:hover{background:#3451d1;box-shadow:0 4px 16px rgba(26,115,232,.45);color:#fff}
+.btn-ghost{background:var(--surface);color:var(--text2);border-color:var(--border2);box-shadow:var(--sh-xs)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-lt)}
+[data-theme="dark"] .btn-ghost{background:var(--surface2)}
+/* ── Export dropdown ── */
+.exp-wrap{position:relative;display:inline-block}
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:188px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;box-shadow:var(--sh-lg,0 8px 28px rgba(0,0,0,.18));padding:6px;z-index:200;display:none}
+.exp-menu.open{display:block}
+[data-theme="dark"] .exp-menu{background:var(--surface2)}
+.exp-menu-head{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:4px 8px 2px}
+.exp-menu-item{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-radius:7px;padding:8px 10px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;font-family:inherit}
+.exp-menu-item:hover{background:var(--accent-lt);color:var(--accent)}
+.exp-menu-sep{height:1px;background:var(--border);margin:5px 4px}
+.exp-menu-chk{display:flex;align-items:center;gap:7px;padding:6px 10px;font-size:11px;color:var(--text3);cursor:pointer;user-select:none}
+.exp-menu-chk input{accent-color:var(--accent);cursor:pointer}
+.btn-explain{
+  background:transparent;color:var(--text3);border:1px solid var(--border);
+  border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600;
+  cursor:pointer;font-family:var(--sans);transition:all .15s;
+  white-space:nowrap;margin-left:auto
+}
+.btn-explain:hover{background:var(--accent-lt);color:var(--accent);border-color:var(--accent)}
+
+/* ─── THEME TOGGLE ────────────────────────────────────── */
+.theme-toggle-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:20px;padding:5px 12px 5px 8px;cursor:pointer;
+  font-family:var(--sans);font-size:11px;font-weight:600;
+  color:var(--text2);box-shadow:var(--sh-xs);transition:all .2s;white-space:nowrap
+}
+.theme-toggle-btn:hover{border-color:var(--accent);color:var(--accent)}
+.theme-toggle-track{
+  width:28px;height:16px;border-radius:8px;
+  background:var(--surface3);border:1.5px solid var(--border2);
+  position:relative;flex-shrink:0;transition:all .25s
+}
+.theme-toggle-track::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--text3);transition:all .25s
+}
+[data-theme="dark"] .theme-toggle-track{background:var(--accent);border-color:var(--accent)}
+[data-theme="dark"] .theme-toggle-track::after{transform:translateX(12px);background:#fff}
+
+/* ─── FILTERS BAR ─────────────────────────────────────── */
+.filters-bar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:10px 24px;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;
+  position:sticky;top:var(--topbar-h);z-index:100;
+  box-shadow:0 2px 10px rgba(12,21,38,.04)
+}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg-lbl{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3)}
+.fg-sel,.fg-in,.fg-date{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--r-sm);color:var(--text);
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  padding:6px 10px;cursor:pointer;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  height:34px;min-width:110px
+}
+.fg-sel{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a95b8'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+  padding-right:24px;-webkit-appearance:none;appearance:none
+}
+.fg-in{font-family:var(--mono);width:180px;caret-color:var(--accent)}
+.fg-date{font-family:var(--mono);width:136px}
+.fg-sel:focus,.fg-in:focus,.fg-date:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,115,232,.12)
+}
+.fg-in::placeholder{color:var(--text3)}
+.fg-date::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer}
+[data-theme="dark"] .fg-sel,
+[data-theme="dark"] .fg-in,
+[data-theme="dark"] .fg-date{background:var(--surface2);color:var(--text);border-color:var(--border)}
+[data-theme="dark"] .fg-date::-webkit-calendar-picker-indicator{filter:invert(.6)}
+.f-sep{width:1px;height:34px;background:var(--border);flex-shrink:0;align-self:flex-end}
+
+/* ─── MAIN ───────────────────────────────────────────── */
+.main{
+  flex:1;padding:24px 24px 64px;
+  display:flex;flex-direction:column;gap:20px;
+  max-width:1800px;width:100%;margin:0 auto
+}
+
+/* ─── SECTION HEADER ────────────────────────────────── */
+.section-hd{display:flex;align-items:center;gap:12px;padding:6px 0 2px}
+.section-hd-line{flex:1;height:1px;background:var(--border)}
+.section-hd-lbl{
+  font-size:9px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3);white-space:nowrap
+}
+
+/* ─── STAT STRIP ─────────────────────────────────────── */
+.stat-strip{display:grid;grid-template-columns:repeat(8,1fr);gap:14px}
+@media(max-width:1400px){.stat-strip{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px) {.stat-strip{grid-template-columns:repeat(2,1fr)}}
+.sc{
+  --c1:var(--ca,var(--accent));
+  --c2:var(--cb, color-mix(in oklab, var(--ca,var(--accent)) 62%, #b14cf0 38%));
+  background:linear-gradient(140deg, var(--c1) 0%, var(--c2) 100%);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:var(--r);padding:17px 16px 14px;
+  display:flex;flex-direction:column;gap:3px;
+  position:relative;overflow:hidden;color:#fff;
+  box-shadow:0 8px 22px -8px color-mix(in oklab, var(--ca,var(--accent)) 70%, transparent),
+             0 2px 6px rgba(12,21,38,.12);
+  transition:box-shadow .25s,transform .25s;cursor:default
+}
+/* glossy top-right highlight */
+.sc::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 88% 8%, rgba(255,255,255,.30), transparent 48%);
+  pointer-events:none
+}
+/* subtle inner sheen line */
+.sc::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
+  pointer-events:none
+}
+.sc:hover{
+  transform:translateY(-3px);
+  box-shadow:0 16px 34px -8px color-mix(in oklab, var(--ca,var(--accent)) 78%, transparent),
+             0 4px 10px rgba(12,21,38,.16)
+}
+.sc-icon{
+  position:absolute;top:14px;right:14px;width:34px;height:34px;
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.28);
+  backdrop-filter:blur(4px);z-index:1;box-shadow:0 2px 8px rgba(0,0,0,.12)
+}
+.sc-val{font-size:28px;font-weight:800;font-family:var(--mono);line-height:1;color:#fff;letter-spacing:-.02em;text-shadow:0 1px 3px rgba(0,0,0,.22);position:relative;z-index:1}
+.sc-lbl{font-size:12px;color:#fff;font-weight:700;margin-top:5px;position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.sc-sub{font-size:10.5px;color:rgba(255,255,255,.9);font-weight:500;font-family:var(--mono);position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.15)}
+
+/* ─── CHART GRID ─────────────────────────────────────── */
+.cg{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}
+.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}
+.c12{grid-column:span 12}
+@media(max-width:1280px){.c3,.c4{grid-column:span 6}.c5,.c7,.c8{grid-column:span 12}}
+@media(max-width:900px) {.c3,.c4,.c5,.c6,.c7,.c8{grid-column:span 12}}
+
+/* ─── CARD ───────────────────────────────────────────── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-sm);
+  display:flex;flex-direction:column;transition:box-shadow .2s
+}
+.card:hover{box-shadow:var(--sh)}
+.ch{
+  padding:12px 16px 11px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;
+  background:var(--surface2)
+}
+.ch-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ch-title{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.ch-sub{font-size:10px;color:var(--text3);margin-left:auto;font-family:var(--mono);white-space:nowrap}
+.ch-badge{margin-left:auto;background:var(--surface3);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:600;color:var(--text2);border:1px solid var(--border)}
+.cb{padding:16px;flex:1}
+.cbf{padding:0;flex:1}
+.cch{position:relative}
+
+/* ─── BAR LIST ───────────────────────────────────────── */
+.bar-list{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:8px}
+.bl-label{width:156px;flex-shrink:0;display:flex;align-items:center;gap:7px;overflow:hidden}
+.bl-text{font-size:11px;color:var(--text2);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.bl-track{flex:1;height:8px;background:var(--surface3);border-radius:4px;overflow:hidden}
+.bl-fill{height:100%;border-radius:4px;transition:width .55s cubic-bezier(.4,0,.2,1)}
+.bl-count{min-width:24px;text-align:right;color:var(--text3);font-family:var(--mono);font-size:11px;font-weight:600}
+.bl-avg{min-width:40px;text-align:right;color:var(--accent);font-family:var(--mono);font-size:11px;font-weight:700}
+
+/* ─── GAUGES ─────────────────────────────────────────── */
+.gauge-row{display:flex;flex-direction:column;gap:12px}
+.gauge-item{display:flex;flex-direction:column;gap:5px}
+.gauge-top{display:flex;justify-content:space-between;align-items:baseline}
+.gauge-lbl{font-size:11px;font-weight:600;color:var(--text2);font-family:var(--mono)}
+.gauge-val{font-size:12px;font-weight:700;font-family:var(--mono)}
+.gauge-track{height:10px;background:var(--surface3);border-radius:6px;overflow:hidden}
+.gauge-fill{height:100%;border-radius:6px;transition:width .65s cubic-bezier(.4,0,.2,1)}
+.gauge-sub{font-size:10px;color:var(--text3);font-family:var(--mono)}
+
+/* ─── HEATMAP ────────────────────────────────────────── */
+.heatmap-wrap{overflow-x:auto;padding:4px 0}
+.heatmap-grid{display:grid;gap:3px}
+.hm-cell{border-radius:3px;transition:opacity .15s,transform .12s;cursor:default}
+.hm-cell:hover{opacity:.7;transform:scale(1.1)}
+.hm-axis{font-size:9px;color:var(--text3);font-family:var(--mono);display:flex;align-items:center}
+
+/* ─── TREEMAP ────────────────────────────────────────── */
+.treemap-wrap{position:relative;overflow:hidden;border-radius:var(--r-sm)}
+.tm-cell{
+  position:absolute;border-radius:6px;overflow:hidden;cursor:pointer;
+  transition:filter .15s,transform .12s,box-shadow .12s;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;text-align:center;box-sizing:border-box
+}
+.tm-cell:hover{filter:brightness(.87);transform:scale(.987);z-index:2;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.tm-lbl{font-size:10px;font-weight:700;color:rgba(0,0,0,.65);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;text-align:center}
+.tm-val{font-size:9px;color:rgba(0,0,0,.5);font-family:var(--mono)}
+
+/* ─── FUNNEL ─────────────────────────────────────────── */
+.funnel-wrap{display:flex;flex-direction:column;gap:6px;padding:4px 0}
+.funnel-row{display:flex;align-items:center;gap:10px}
+.funnel-label{width:140px;flex-shrink:0;font-size:11px;color:var(--text2);font-family:var(--mono);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.funnel-bar-wrap{flex:1;display:flex;align-items:center;justify-content:center}
+.funnel-bar{border-radius:4px;height:28px;display:flex;align-items:center;justify-content:center;transition:width .65s cubic-bezier(.4,0,.2,1)}
+.funnel-count{width:36px;text-align:left;font-size:11px;font-weight:700;color:var(--text2);font-family:var(--mono);flex-shrink:0}
+.funnel-pct{width:38px;text-align:left;font-size:10px;color:var(--text3);font-family:var(--mono);flex-shrink:0}
+
+/* ─── AVATARS ────────────────────────────────────────── */
+.bav{width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0;vertical-align:middle;border:1.5px solid var(--border2);background:var(--surface3);display:inline-block}
+.bav-fb{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#c7d2ff,#1a73e8);display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;vertical-align:middle;font-family:var(--sans);border:1.5px solid rgba(26,115,232,.2)}
+.pcell{display:inline-flex;align-items:center;gap:6px}
+.pcell-name{font-family:var(--mono);font-size:11px;color:var(--text2)}
+
+/* ─── SEV / STATUS ───────────────────────────────────── */
+.sev{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:10px;font-weight:700;color:#fff}
+.s1{background:var(--s1)}.s2{background:var(--s2)}.s3{background:var(--s3)}.s4{background:var(--s4)}.s5{background:var(--s5)}
+.sdot{display:inline-flex;align-items:center;gap:5px;font-size:11px}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-open{background:var(--warn)}.dot-resolved{background:var(--accent2)}
+.breach{background:var(--danger-lt);color:var(--danger);border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;border:1px solid rgba(217,48,37,.2)}
+.ok{background:var(--accent2-lt);color:var(--accent2);border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;border:1px solid rgba(30,142,62,.2)}
+.pct-bar{display:inline-flex;align-items:center;gap:6px}
+.pct-track{width:50px;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.pct-fill{height:100%;border-radius:3px}
+
+/* ─── DATA TABLE ─────────────────────────────────────── */
+.dtw{overflow-x:auto}
+.dt{width:100%;border-collapse:collapse;font-size:11px}
+.dt thead th{
+  background:var(--surface2);padding:10px 12px;
+  font-size:9px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--text3);text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+  cursor:pointer;user-select:none;transition:color .12s;
+  position:sticky;top:0;z-index:1
+}
+.dt thead th:hover{color:var(--accent)}
+.dt thead th.sort-asc::after{content:' ↑';color:var(--accent)}
+.dt thead th.sort-desc::after{content:' ↓';color:var(--accent)}
+.dt tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+.dt tbody tr:last-child{border-bottom:none}
+.dt tbody tr:hover td{background:rgba(26,115,232,.05)}
+.dt td{padding:9px 12px;color:var(--text2);font-family:var(--mono);vertical-align:middle;white-space:nowrap}
+.dt td.tc{font-family:var(--sans);white-space:normal;max-width:240px;font-size:11px;color:var(--text)}
+.tid{color:var(--accent);font-weight:600}
+.tid a{color:inherit;text-decoration:none}
+.tid a:hover{text-decoration:underline}
+/* col search row */
+.dt-search-row td{padding:4px 6px;background:var(--surface2);border-bottom:2px solid var(--border2)}
+.dt-col-search{
+  width:100%;padding:4px 7px;font-size:10px;font-family:var(--mono);
+  background:var(--surface);border:1px solid var(--border);border-radius:5px;
+  color:var(--text);outline:none;transition:border-color .12s,box-shadow .12s;min-width:0
+}
+.dt-col-search:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(26,115,232,.12)}
+.dt-col-search::placeholder{color:var(--text3);font-style:italic}
+[data-theme="dark"] .dt-col-search{background:var(--surface2);color:var(--text);border-color:var(--border)}
+
+/* ─── PAGINATION ─────────────────────────────────────── */
+.pgn{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0}
+.pgn .sp{flex:1}
+.pg-info{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.pg-btn{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;color:var(--text2);font-size:11px;
+  font-weight:600;padding:5px 14px;cursor:pointer;
+  font-family:var(--sans);transition:all .12s
+}
+.pg-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:var(--accent-lt)}
+.pg-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ─── EXPLAIN MODAL ──────────────────────────────────── */
+.explain-backdrop{
+  position:fixed;inset:0;z-index:3000;
+  background:rgba(12,21,38,.5);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  animation:fadeIn .15s ease
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.explain-modal{
+  background:var(--surface);border-radius:18px;
+  padding:28px 30px;max-width:500px;width:100%;
+  box-shadow:var(--sh-lg);position:relative;
+  border:1px solid var(--border);
+  animation:slideUp .22s cubic-bezier(.34,1.4,.64,1)
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(20px) scale(.96)}
+  to  {opacity:1;transform:none}
+}
+.explain-modal h3{font-size:15px;font-weight:800;margin-bottom:6px;letter-spacing:-.02em;color:var(--text)}
+.explain-modal p{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:8px}
+.explain-modal ul{padding-left:18px;margin-bottom:8px}
+.explain-modal li{font-size:12px;color:var(--text2);line-height:1.7}
+.explain-modal .em-close{
+  position:absolute;top:14px;right:14px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;width:30px;height:30px;cursor:pointer;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  color:var(--text3);transition:all .12s
+}
+.explain-modal .em-close:hover{background:var(--danger-lt);color:var(--danger);border-color:rgba(217,48,37,.3)}
+.explain-tag{
+  display:inline-block;background:var(--accent-lt);color:var(--accent);
+  border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;
+  font-family:var(--mono);margin-bottom:12px;letter-spacing:.04em
+}
+/* ── Compare Periods ─────────────────────────────────────── */
+.cp-seg-btn{
+  border:none;background:transparent;color:var(--text3);
+  font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;
+  padding:6px 14px;border-radius:7px;transition:all .12s;
+}
+.cp-seg-btn:hover{color:var(--accent)}
+.cp-seg-btn.active{background:var(--accent);color:#fff;box-shadow:0 1px 6px rgba(26,115,232,.3)}
+.cp-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:760px){.cp-kpi-strip{grid-template-columns:repeat(2,1fr)}#compare-modal>div:last-child div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}}
+.cp-kpi{
+  background:var(--surface2);border:1px solid var(--border);border-radius:13px;
+  padding:14px 16px;display:flex;flex-direction:column;gap:4px;
+}
+.cp-kpi-lbl{font-size:10.5px;font-weight:700;color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
+.cp-kpi-val{font-size:23px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1}
+.cp-kpi-sub{font-size:11px;color:var(--text3)}
+.cp-delta{font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:3px}
+.cp-delta.up{color:var(--danger)}
+.cp-delta.down{color:var(--accent2)}
+.cp-delta.up.good{color:var(--accent2)}
+.cp-delta.down.bad{color:var(--danger)}
+.cp-delta.flat{color:var(--text3)}
+#cp-table th,#cp-table td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--border)}
+#cp-table th:first-child,#cp-table td:first-child{text-align:left;font-weight:700}
+#cp-table th{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0;background:var(--surface)}
+#cp-table td{color:var(--text2)}
+#cp-table tr:hover td{background:var(--accent-lt)}
+#cp-table td.cp-breach-hi{color:var(--danger);font-weight:700}
+
+/* ─── AUDIT ──────────────────────────────────────────── */
+#audit-section{display:none;flex-direction:column;gap:18px;margin-top:4px}
+#audit-section.visible{display:flex}
+.audit-kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+@media(max-width:1400px){.audit-kpi-strip{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px) {.audit-kpi-strip{grid-template-columns:repeat(2,1fr)}}
+.auditor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.auditor-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px 16px 14px;
+  display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--sh-sm);transition:box-shadow .2s,transform .2s;
+  position:relative;overflow:hidden
+}
+.auditor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--aca,var(--accent));border-radius:var(--r) var(--r) 0 0}
+.auditor-card:hover{box-shadow:var(--sh);transform:translateY(-1px)}
+.auditor-head{display:flex;align-items:center;gap:12px}
+.auditor-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2.5px solid var(--aca,var(--accent));flex-shrink:0}
+.auditor-avatar-fb{width:48px;height:48px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;border:2.5px solid var(--border2)}
+.auditor-name{font-size:12px;font-weight:700;font-family:var(--mono);color:var(--text)}
+.auditor-meta{font-size:10px;color:var(--text3);margin-top:2px}
+.auditor-rate{font-size:22px;font-weight:800;font-family:var(--mono);line-height:1}
+.auditor-rate-lbl{font-size:9px;color:var(--text3)}
+.auditor-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.auditor-stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center}
+.auditor-stat-val{font-size:15px;font-weight:800;font-family:var(--mono);line-height:1}
+.auditor-stat-lbl{font-size:9px;color:var(--text3);margin-top:2px}
+.audit-bars{display:flex;flex-direction:column;gap:6px}
+.audit-bar-row{display:flex;align-items:center;gap:7px}
+.abl-label{font-size:10px;color:var(--text3);width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.abl-track{flex:1;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.abl-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.abl-val{font-size:10px;font-family:var(--mono);font-weight:600;color:var(--text2);min-width:20px;text-align:right}
+.findings-list{display:flex;flex-direction:column;gap:8px}
+.findings-row{display:flex;align-items:center;gap:8px}
+.fl-label{font-size:11px;color:var(--text2);font-family:var(--mono);width:200px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fl-track{flex:1;height:7px;background:var(--surface3);border-radius:4px;overflow:hidden}
+.fl-fill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.fl-count{min-width:24px;text-align:right;color:var(--text3);font-family:var(--mono);font-size:11px;font-weight:600}
+.adt-wrap{overflow-x:auto}
+.adt{width:100%;border-collapse:collapse;font-size:11px}
+.adt thead th{background:var(--surface2);padding:9px 11px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.adt tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+.adt tbody tr:last-child{border-bottom:none}
+.adt tbody tr:hover td{background:var(--surface2)}
+.adt td{padding:9px 11px;color:var(--text2);font-family:var(--mono);vertical-align:middle;white-space:nowrap}
+.adt td.adt-wrap-cell{white-space:normal;max-width:180px;font-size:10px;line-height:1.45}
+.adt-pass{background:var(--accent2-lt);color:var(--accent2);border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;border:1px solid rgba(30,142,62,.22)}
+.adt-fail{background:var(--danger-lt);color:var(--danger);border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;border:1px solid rgba(217,48,37,.22)}
+.audit-reload-pill{
+  display:flex;align-items:center;gap:8px;padding:9px 14px;
+  background:var(--accent2-lt);border:1px solid rgba(30,142,62,.25);
+  border-radius:var(--r);font-size:11px;color:var(--accent2);font-weight:600
+}
+
+/* ─── DARK TABLE HOVER ────────────────────────────────── */
+[data-theme="dark"] .dt tbody tr:hover td{background:rgba(91,127,255,.07)}
+[data-theme="dark"] .adt tbody tr:hover td{background:rgba(91,127,255,.06)}
+
+/* ─── POPUP CARDS (city/building detail) ─────────────── */
+.lp{padding:16px 20px;font-family:var(--sans);min-width:380px}
+.lp-city{font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px}
+.lp-country{font-size:10px;color:var(--text3);margin-bottom:10px}
+.lp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.lp-stat{background:var(--surface2);border-radius:10px;padding:12px 8px;text-align:center;border:1px solid var(--border)}
+.lp-stat-v{font-size:22px;font-weight:800;line-height:1}
+.lp-stat-l{font-size:10px;color:var(--text3);margin-top:3px}
+.lp-avatars{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.lp-av{width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.15);display:inline-block;vertical-align:middle}
+.lp-av-fb{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;vertical-align:middle}
+.lp-btn{width:100%;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s}
+.lp-btn:hover{background:#3451d1}
+/* City / Building lightbox popups */
+.lp{padding:16px 20px;font-family:var(--sans);min-width:380px}
+.lp-city-card,.lp-building-card{padding:0;overflow:hidden;}
+.lp-city-header{transition:background .2s;}
+.cv-cluster{display:flex;flex-direction:column;align-items:center}
+.cv-badges{display:flex}
+.cv-badge{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);margin-left:-6px;display:block}
+.cv-badge:first-child{margin-left:0}
+.cv-badge-fb{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);margin-left:-6px;flex-shrink:0}
+.cv-badge-fb:first-child{margin-left:0}
+.cv-label{font-size:9px;font-weight:700;color:var(--text);font-family:var(--mono);margin-top:3px;white-space:nowrap;text-shadow:0 1px 2px rgba(255,255,255,.9)}
+.cv-pin{width:8px;height:8px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.25);margin-top:2px}
+
+/* ─── TECH-GRID ANIMATED BACKGROUND ──────────────────── */
+#bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.9}
+.shell{position:relative;z-index:1}
+body{background:var(--bg)}
+/* keep surfaces readable above the canvas */
+.topbar,.filters-bar{position:sticky}
+
+/* ─── SIDE AVATAR SHOWCASE — rising techs, both margins ── */
+.side-rise{
+  position:fixed;top:var(--topbar-h);bottom:0;width:236px;
+  z-index:3;pointer-events:none;overflow:hidden;display:none
+}
+.side-rise.on{display:block}
+#side-rise-left{left:0}
+#side-rise-right{right:0}
+.rise-av{
+  position:absolute;left:50%;bottom:-90px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  will-change:transform,opacity
+}
+/* plain circular avatar (no city) */
+.rise-av img,.rise-av .rfb{
+  width:38px;height:38px;border-radius:50%;object-fit:cover;
+  border:2px solid rgba(255,255,255,.9);box-shadow:0 3px 12px rgba(0,0,0,.28)
+}
+.rise-av .rfb{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;background:rgba(60,64,67,.55)}
+/* map-backed tile when cities are involved */
+.rise-map{
+  position:relative;width:88px;height:64px;border-radius:12px;overflow:hidden;
+  background-size:cover;background-position:center;
+  border:1px solid rgba(255,255,255,.35);box-shadow:0 4px 16px rgba(0,0,0,.30)
+}
+.rise-map::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(160deg,rgba(26,115,232,.30),rgba(132,48,206,.45));z-index:0}
+.rise-map .rise-av-inner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1}
+.rise-map .rise-av-inner img,.rise-map .rise-av-inner .rfb{
+  width:34px;height:34px;border-radius:50%;object-fit:cover;
+  border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.rise-map .rise-av-inner .rfb{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;background:rgba(60,64,67,.7)}
+.rise-lbl{font-size:11.5px;font-weight:700;font-family:var(--mono);color:var(--text);
+  background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:3px 10px;
+  white-space:nowrap;box-shadow:var(--sh-sm);max-width:212px;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+/* achievement avatar (ringed badge + superlative) */
+.rise-ach{position:relative;width:46px;height:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(140deg,var(--ac1,#1a73e8),var(--ac2,#8430ce));
+  box-shadow:0 4px 16px rgba(0,0,0,.3),0 0 0 3px rgba(255,255,255,.55)}
+.rise-ach img.ach,.rise-ach .rfb.ach{
+  width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:none}
+.rise-ach .rfb.ach{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;background:rgba(60,64,67,.7)}
+.rise-ach-badge{position:absolute;bottom:-4px;right:-4px;width:22px;height:22px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);box-shadow:var(--sh-xs);
+  display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+.rise-lbl-ach{font-size:12px;font-weight:800;color:var(--text)}
+.rise-sub{font-size:10.5px;font-weight:700;font-family:var(--mono);
+  color:#fff;background:linear-gradient(140deg,var(--ac1,#1a73e8),var(--ac2,#8430ce));
+  border-radius:8px;padding:3px 10px;white-space:nowrap;box-shadow:var(--sh-sm);
+  max-width:212px;overflow:hidden;text-overflow:ellipsis;margin-top:1px;
+  text-shadow:0 1px 2px rgba(0,0,0,.25);letter-spacing:.01em}
+@keyframes riseUp{
+  0%{transform:translate(-50%,0);opacity:0}
+  12%{opacity:1}
+  88%{opacity:1}
+  100%{transform:translate(-50%,calc(-100vh + 140px));opacity:0}
+}
+@media(max-width:1740px){.side-rise{display:none!important}}
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:768px){.topbar,.filters-bar,.main{padding-left:14px;padding-right:14px}.t-stats{gap:12px}}
+@media(max-width:580px){
+  .t-stats .t-stat:nth-child(n+3){display:none}
+  .fg-in{width:120px}
+  .t-div+.t-stats,.t-vr+.t-stats{display:none}
+  .t-actions .btn-ghost:not(#btn-load-files-topbar){display:none}
+}
+</style>
+<!-- PRO ENHANCEMENT LAYER — additive, loaded after base styles so it wins by source order -->
+<link rel="stylesheet" href="analytics-pro.css"/>
+</head>
+<body>
+
+<!-- Animated tech-grid background -->
+<canvas id="bg-fx"></canvas>
+
+<!-- ════════════════════════ LOAD SCREEN ════════════════════════ -->
+<div id="load-screen">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:4px;">
+    <div class="ls-amz-mark">
+      <svg width="54" height="38" viewBox="0 0 130 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="65" y="52" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="58" font-weight="900" fill="#FF9900">a</text>
+        <path d="M22 70 Q65 90 108 70" stroke="#FF9900" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+        <path d="M104 63 L110 71 L116 64" stroke="#FF9900" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
+      <div class="ls-title">EOS Analytics</div>
+      <span class="ls-chip">ITVendor-EOS</span>
+    </div>
+    <div style="font-size:11px;color:var(--text3);font-weight:500;">amazon · EOS IT Solutions</div>
+  </div>
+
+  <div style="font-size:12px;color:var(--text3);text-align:center;max-width:300px;line-height:1.6;">
+    Select your files — JSON and / or Excel together
+  </div>
+
+  <button class="btn btn-primary" id="btn-load-file" style="font-size:13px;padding:10px 26px;border-radius:10px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:15px;height:15px;"><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 9l5-5 5 5M12 4v12"/></svg>
+    Choose Files
+  </button>
+
+  <div style="display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text3);">
+    <span class="ls-ftag json">sla-data.json</span>
+    <span style="color:var(--border2);">and / or</span>
+    <span class="ls-ftag xlsx">audit .xlsx</span>
+  </div>
+  <div style="font-size:11px;color:var(--text3);font-family:var(--mono);">or drag &amp; drop both files at once — any order</div>
+</div>
+
+
+<!-- ════════════════════════ APP SHELL ════════════════════════ -->
+<div class="shell" id="app" style="display:none;">
+
+  <!-- Side avatar showcase — rising techs on both margins (wide screens only) -->
+  <aside id="side-rise-left"  class="side-rise"></aside>
+  <aside id="side-rise-right" class="side-rise"></aside>
+
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="t-logo">
+      <div class="t-logo-mark">
+        <svg width="22" height="16" viewBox="0 0 130 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="65" y="52" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="60" font-weight="900" fill="#FF9900">a</text>
+          <path d="M22 70 Q65 90 108 70" stroke="#FF9900" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M104 63 L110 71 L116 64" stroke="#FF9900" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="t-logo-name">EOS Analytics</div>
+        <div class="t-logo-sub">amazon · ITVendor-EOS</div>
+      </div>
+    </div>
+
+    <div class="t-vr"></div>
+
+    <div class="t-stats">
+      <div class="t-stat"><div class="t-stat-val" id="tb-total">—</div><div class="t-stat-lbl">All Tickets</div></div>
+      <div class="t-stat"><div class="t-stat-val" id="tb-filtered">—</div><div class="t-stat-lbl">Filtered</div></div>
+      <div class="t-stat"><div class="t-stat-val danger" id="tb-breached">—</div><div class="t-stat-lbl">EOS Breached</div></div>
+      <div class="t-stat"><div class="t-stat-val" id="tb-ls-breached" style="color:#f97316;">—</div><div class="t-stat-lbl">Lifespan Breach</div></div>
+    </div>
+
+    <div id="file-status-bar">
+      <div class="fsb-item unloaded" id="fsb-json">📊 JSON</div>
+      <div class="fsb-item unloaded" id="fsb-xlsx">📋 Audit</div>
+    </div>
+
+    <div class="t-actions">
+      <button class="btn btn-ghost" id="btn-load-files-topbar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 9l5-5 5 5M12 4v12"/></svg>
+        Load Files
+      </button>
+      <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark / light mode">
+        <div class="theme-toggle-track"></div>
+        <span id="theme-toggle-lbl">Light</span>
+      </button>
+      <button class="btn btn-ghost" id="btn-compare-periods">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 3v18h18M8 17V9M13 17V5M18 17v-6"/></svg>
+        Compare
+      </button>
+      <button class="btn btn-ghost" id="btn-reload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
+        Reload
+      </button>
+      <button class="btn btn-ghost" id="btn-export-csv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Export CSV
+      </button>
+      <div class="exp-wrap" id="exp-wrap">
+        <button class="btn btn-ghost" id="btn-export-xlsx">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13l6 6M15 13l-6 6"/></svg>
+          Export Excel
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" style="width:12px;height:12px;margin-left:2px;"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="exp-menu" id="exp-menu">
+          <div class="exp-menu-head">Scope</div>
+          <button class="exp-menu-item" data-scope="all">📋 All tickets</button>
+          <button class="exp-menu-item" data-scope="breach">🚨 Out-of-SLA only</button>
+          <div class="exp-menu-sep"></div>
+          <label class="exp-menu-chk"><input type="checkbox" id="exp-photos" checked> Embed badge photos</label>
+        </div>
+      </div>
+    </div>
+  </div><!-- /topbar -->
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <div class="fg"><div class="fg-lbl">Severity</div><select class="fg-sel" id="f-sev"><option value="">All Severities</option></select></div>
+    <div class="fg"><div class="fg-lbl">Country</div><select class="fg-sel" id="f-country"><option value="">All Countries</option></select></div>
+    <div class="fg"><div class="fg-lbl">City</div><select class="fg-sel" id="f-city"><option value="">All Cities</option></select></div>
+    <div class="fg"><div class="fg-lbl">Building</div><select class="fg-sel" id="f-building"><option value="">All Buildings</option></select></div>
+    <div class="fg"><div class="fg-lbl">Assignee</div><select class="fg-sel" id="f-assignee"><option value="">All Assignees</option></select></div>
+    <div class="fg"><div class="fg-lbl">Requester</div><select class="fg-sel" id="f-requester"><option value="">All Requesters</option></select></div>
+    <div class="fg"><div class="fg-lbl">Root Cause</div><select class="fg-sel" id="f-rootcause" style="min-width:140px;"><option value="">All Root Causes</option></select></div>
+    <div class="fg"><div class="fg-lbl">Closure</div><select class="fg-sel" id="f-closure"><option value="">All</option></select></div>
+    <div class="f-sep"></div>
+    <div class="fg">
+      <div class="fg-lbl">SLA Breach</div>
+      <select class="fg-sel" id="f-breach">
+        <option value="">All</option>
+        <option value="breached">EOS Breached</option>
+        <option value="ok">EOS On Track</option>
+        <option value="ls-breached">Lifespan Breached</option>
+        <option value="ls-ok">Lifespan On Track</option>
+      </select>
+    </div>
+    <div class="fg"><div class="fg-lbl">Search</div><input class="fg-in" id="f-search" placeholder="ticket ID or title…"/></div>
+    <div class="f-sep"></div>
+    <div class="fg">
+      <div class="fg-lbl">Resolved — From</div>
+      <input type="date" class="fg-date" id="f-date-from" title="Filter tickets resolved on or after this date. Open tickets always included."/>
+    </div>
+    <div class="fg">
+      <div class="fg-lbl">Resolved — To</div>
+      <input type="date" class="fg-date" id="f-date-to" title="Filter tickets resolved on or before this date. Open tickets always included."/>
+    </div>
+    <button class="btn btn-ghost" id="btn-clear-filters" style="align-self:flex-end;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Clear
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main-content">
+
+    <!-- KPI strip -->
+    <div class="stat-strip" id="stat-strip"></div>
+
+    <!-- Volume & SLA Health -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">📈 Volume &amp; SLA Health</div><div class="section-hd-line"></div></div>
+    <div class="cg">
+      <div class="card c8">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--accent-lt);">📈</div>
+          <div class="ch-title">EOS Business Hours — Top Tickets</div>
+          <div class="ch-sub" id="bar-sub"></div>
+          <button class="btn-explain" data-explain="top-tickets">? Explain</button>
+        </div>
+        <div class="cb cch" style="height:240px;"><canvas id="chart-bar"></canvas></div>
+      </div>
+      <div class="card c4">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--warn-lt);">🎯</div>
+          <div class="ch-title">Severity Distribution</div>
+          <button class="btn-explain" data-explain="sev-dist">? Explain</button>
+        </div>
+        <div class="cb cch" style="height:240px;"><canvas id="chart-sev-pie"></canvas></div>
+      </div>
+    </div>
+
+    <!-- SLA Performance -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">🚦 SLA Performance — EOS &amp; Lifespan</div><div class="section-hd-line"></div></div>
+    <div class="cg">
+      <div class="card c4">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--danger-lt);">⏱</div>
+          <div class="ch-title">Avg EOS Hours by Severity</div>
+          <button class="btn-explain" data-explain="avg-sev">? Explain</button>
+        </div>
+        <div class="cb cch" style="height:210px;"><canvas id="chart-sev-bar"></canvas></div>
+      </div>
+      <div class="card c4">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--accent2-lt);">🚦</div>
+          <div class="ch-title">SLA Breach by Severity</div>
+          <button class="btn-explain" data-explain="breach-sev">? Explain</button>
+        </div>
+        <div class="cb cch" style="height:210px;"><canvas id="chart-breach-sev"></canvas></div>
+      </div>
+      <div class="card c4">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--purple-lt);">🧮</div>
+          <div class="ch-title">SLA Consumption Gauges</div>
+          <button class="btn-explain" data-explain="sla-gauges">? Explain</button>
+        </div>
+        <div class="cb" id="sla-gauges" style="overflow-y:auto;max-height:420px;"></div>
+      </div>
+    </div>
+
+    <!-- Root Cause & Quality -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">🔬 Root Cause &amp; Quality</div><div class="section-hd-line"></div></div>
+    <div class="cg">
+      <div class="card c4">
+        <div class="ch"><div class="ch-icon" style="background:var(--danger-lt);">🔍</div><div class="ch-title">Root Cause Breakdown</div><button class="btn-explain" data-explain="rootcause">? Explain</button></div>
+        <div class="cb cch" style="height:240px;"><canvas id="chart-rootcause"></canvas></div>
+      </div>
+      <div class="card c4">
+        <div class="ch"><div class="ch-icon" style="background:var(--purple-lt);">✅</div><div class="ch-title">Closure Code Breakdown</div><button class="btn-explain" data-explain="closure">? Explain</button></div>
+        <div class="cb cch" style="height:240px;"><canvas id="chart-closure"></canvas></div>
+      </div>
+      <div class="card c4">
+        <div class="ch"><div class="ch-icon" style="background:var(--teal-lt);">🎯</div><div class="ch-title">Resolution Funnel</div><button class="btn-explain" data-explain="funnel">? Explain</button></div>
+        <div class="cb" id="funnel-container" style="min-height:240px;"></div>
+      </div>
+    </div>
+    <div class="cg">
+      <div class="card c6">
+        <div class="ch"><div class="ch-icon" style="background:var(--accent-lt);">📊</div><div class="ch-title">EOS Hours Distribution (Histogram)</div><button class="btn-explain" data-explain="histogram">? Explain</button></div>
+        <div class="cb cch" style="height:210px;"><canvas id="chart-histogram"></canvas></div>
+      </div>
+      <div class="card c6">
+        <div class="ch"><div class="ch-icon" style="background:var(--warn-lt);">🔘</div><div class="ch-title">Hours vs SLA Cap — Scatter</div><button class="btn-explain" data-explain="scatter">? Explain</button></div>
+        <div class="cb cch" style="height:210px;"><canvas id="chart-scatter"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Time Patterns -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">📅 Time Patterns</div><div class="section-hd-line"></div></div>
+    <div class="cg">
+      <div class="card c12">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--accent-lt);">📅</div>
+          <div class="ch-title">EOS Activity Over Time — Daily Ticket Volume &amp; Avg Business Hours</div>
+          <button class="btn-explain" data-explain="timeline">? Explain</button>
+        </div>
+        <div class="cb cch" style="height:220px;"><canvas id="chart-timeline"></canvas></div>
+      </div>
+    </div>
+    <div class="cg">
+      <div class="card c6">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--warn-lt);">🌡</div>
+          <div class="ch-title">Activity Heatmap — Resolved: Day of Week × Hour</div>
+          <button class="btn-explain" data-explain="heatmap">? Explain</button>
+        </div>
+        <div class="cb" id="heatmap-container" style="min-height:170px;"></div>
+      </div>
+      <div class="card c6">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--teal-lt);">📉</div>
+          <div class="ch-title">Cumulative Ticket Intake Over Time</div>
+          <button class="btn-explain" data-explain="cumulative">? Explain</button>
+        </div>
+        <div class="cb cch" style="height:170px;"><canvas id="chart-cumulative"></canvas></div>
+      </div>
+    </div>
+
+    <!-- People -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">👥 People</div><div class="section-hd-line"></div></div>
+    <div class="cg">
+      <div class="card c6">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--warn-lt);">👤</div>
+          <div class="ch-title">By Assignee</div>
+          <div class="ch-badge" id="assignee-count-badge">—</div>
+          <button class="btn-explain" data-explain="assignee">? Explain</button>
+        </div>
+        <div class="cb" id="assignee-bars" style="overflow-y:auto;max-height:300px;"></div>
+      </div>
+      <div class="card c6">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--accent2-lt);">🙋</div>
+          <div class="ch-title">By Requester</div>
+          <div class="ch-badge" id="requester-count-badge">—</div>
+          <button class="btn-explain" data-explain="requester">? Explain</button>
+        </div>
+        <div class="cb" id="requester-bars" style="overflow-y:auto;max-height:300px;"></div>
+      </div>
+    </div>
+    <div class="cg">
+      <div class="card c6">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--pink-lt);">🏋</div>
+          <div class="ch-title">Assignee Workload vs SLA Risk</div>
+          <button class="btn-explain" data-explain="workload-risk">? Explain</button>
+        </div>
+        <div class="cb cch" style="height:250px;"><canvas id="chart-workload-risk"></canvas></div>
+      </div>
+      <div class="card c6">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--teal-lt);">⚡</div>
+          <div class="ch-title">Resolution Speed Ranking</div>
+          <button class="btn-explain" data-explain="resolution-speed">? Explain</button>
+        </div>
+        <div class="cb cch" style="height:250px;"><canvas id="chart-resolution-speed"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Geography -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">🌍 Geography</div><div class="section-hd-line"></div></div>
+    <div class="cg" style="align-items:start;">
+      <!-- Left column: Country + City stacked -->
+      <div style="grid-column:span 3;display:flex;flex-direction:column;gap:16px;">
+        <div class="card" style="width:100%;">
+          <div class="ch"><div class="ch-icon" style="background:var(--purple-lt);">🌍</div><div class="ch-title">Tickets by Country</div><button class="btn-explain" data-explain="country">? Explain</button></div>
+          <div class="cb" id="country-bars" style="overflow-y:auto;max-height:260px;"></div>
+        </div>
+        <div class="card" style="width:100%;">
+          <div class="ch"><div class="ch-icon" style="background:var(--warn-lt);">🏢</div><div class="ch-title">Tickets by City</div><button class="btn-explain" data-explain="city">? Explain</button></div>
+          <div class="cb" id="city-bars" style="overflow-y:auto;max-height:260px;"></div>
+        </div>
+      </div>
+      <!-- Right: Treemap full width -->
+      <div class="card" style="grid-column:span 9;">
+        <div class="ch"><div class="ch-icon" style="background:var(--accent2-lt);">🏗</div><div class="ch-title">Volume Treemap by City</div><button class="btn-explain" data-explain="treemap">? Explain</button></div>
+        <div class="cb" id="treemap-container" style="min-height:520px;padding:0;overflow:visible;"></div>
+      </div>
+    </div>
+
+    <!-- Repeat & Bounce -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">🔄 Repeat &amp; Bounce</div><div class="section-hd-line"></div></div>
+    <div class="cg">
+      <div class="card c6">
+        <div class="ch"><div class="ch-icon" style="background:var(--danger-lt);">🏓</div><div class="ch-title">Bounced Tickets (Multi-Stint)</div><button class="btn-explain" data-explain="bounce">? Explain</button></div>
+        <div class="cb cch" style="height:210px;"><canvas id="chart-bounce"></canvas></div>
+      </div>
+      <div class="card c6">
+        <div class="ch"><div class="ch-icon" style="background:var(--purple-lt);">🔁</div><div class="ch-title">Repeat Requesters (Top Submitters)</div><button class="btn-explain" data-explain="repeat-req">? Explain</button></div>
+        <div class="cb cch" style="height:210px;"><canvas id="chart-repeat-req"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Deep Analysis -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">🔭 Deep Analysis</div><div class="section-hd-line"></div></div>
+
+    <!-- Row 1: Root cause × closure matrix -->
+    <div class="cg">
+      <div class="card" style="grid-column:span 12;">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--purple-lt);">〰</div>
+          <div class="ch-title">Root Cause × Closure Code Matrix</div>
+          <button class="btn-explain" data-explain="rootclosure">? Explain</button>
+        </div>
+        <div class="cb" id="rootclosure-container" style="overflow-x:auto;min-height:220px;padding:4px 0;"></div>
+      </div>
+    </div>
+
+    <!-- Row 2: Weekend skip impact -->
+    <div class="cg">
+      <div class="card" style="grid-column:span 12;">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--warn-lt);">📅</div>
+          <div class="ch-title">Weekend Skip → Breach Impact</div>
+          <button class="btn-explain" data-explain="weekend">? Explain</button>
+        </div>
+        <div class="cb" id="weekend-container" style="min-height:240px;"></div>
+      </div>
+    </div>
+
+    <!-- Ticket Lifespan Analysis -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">⌛ Ticket Lifespan &amp; Lifespan SLA Analysis</div><div class="section-hd-line"></div></div>
+    <div class="cg">
+      <div class="card" style="grid-column:span 12;">
+        <div class="ch">
+          <div class="ch-icon" style="background:rgba(99,102,241,.15);">📅</div>
+          <div class="ch-title">Total Ticket Lifespan — Created → Resolved (excl. weekends &amp; non-working hours)</div>
+          <button class="btn-explain" data-explain="lifespan">? Explain</button>
+        </div>
+        <div class="cb" id="lifespan-section" style="min-height:200px;"></div>
+      </div>
+    </div>
+
+    <!-- Ticket Table -->
+    <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">🗂 Ticket List</div><div class="section-hd-line"></div></div>
+    <div class="card" style="width:100%;">
+      <div class="ch">
+        <div class="ch-icon" style="background:var(--surface3);">🗂</div>
+        <div class="ch-title">All Tickets</div>
+        <div class="ch-sub" id="table-count"></div>
+        <button class="btn btn-ghost" id="btn-table-csv" style="margin-left:auto;padding:5px 12px;font-size:12px;" title="Export every row currently in this table (respects active filters &amp; sort) as a full-detail CSV">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Print table CSV
+        </button>
+        <button class="btn-explain" data-explain="table">? Explain</button>
+      </div>
+      <div class="cbf dtw">
+        <table class="dt" id="tickets-table">
+          <thead>
+            <tr>
+              <th data-col="shortId">Ticket</th>
+              <th data-col="sev">Sev</th>
+              <th data-col="status">Status</th>
+              <th data-col="assigneeName">Assignee</th>
+              <th data-col="requester">Requester</th>
+              <th data-col="city">City</th>
+              <th data-col="country">Country</th>
+              <th data-col="buildingId">Building</th>
+              <th data-col="rootCause">Root Cause</th>
+              <th data-col="closureCode">Closure</th>
+              <th data-col="eosHours">EOS hrs</th>
+              <th data-col="lifespanBizHours">Lifespan hrs</th>
+              <th data-col="lifespanCalDays">Cal Days</th>
+              <th data-col="slaStatus">SLA</th>
+              <th data-col="totalBounces">Bounces</th>
+              <th data-col="totalResolves">Resolves</th>
+              <th data-col="resolvedDate">Resolved</th>
+            </tr>
+            <tr id="table-search-row" class="dt-search-row">
+              <td><input class="dt-col-search" data-col="shortId"     placeholder="🔍 ID…"/></td>
+              <td><input class="dt-col-search" data-col="sev"         placeholder="Sev…"/></td>
+              <td><input class="dt-col-search" data-col="status"      placeholder="Status…"/></td>
+              <td><input class="dt-col-search" data-col="assigneeName" placeholder="Assignee…"/></td>
+              <td><input class="dt-col-search" data-col="requester"   placeholder="Requester…"/></td>
+              <td><input class="dt-col-search" data-col="city"        placeholder="City…"/></td>
+              <td><input class="dt-col-search" data-col="country"     placeholder="Country…"/></td>
+              <td><input class="dt-col-search" data-col="buildingId"  placeholder="Building…"/></td>
+              <td><input class="dt-col-search" data-col="rootCause"   placeholder="Root cause…"/></td>
+              <td><input class="dt-col-search" data-col="closureCode" placeholder="Closure…"/></td>
+              <td></td>
+              <td></td><td></td>
+              <td><input class="dt-col-search" data-col="slaStatus"   placeholder="SLA…"/></td>
+              <td></td><td></td>
+              <td><input class="dt-col-search" data-col="resolvedDate" placeholder="Date…"/></td>
+            </tr>
+          </thead>
+          <tbody id="tickets-tbody"></tbody>
+        </table>
+      </div>
+      <div class="pgn">
+        <span class="pg-info" id="pg-info"></span>
+        <div class="sp"></div>
+        <button class="pg-btn" id="pg-prev">← Prev</button>
+        <button class="pg-btn" id="pg-next">Next →</button>
+      </div>
+    </div>
+
+    <!-- ════════════════ AUDIT SECTION ════════════════ -->
+    <div id="audit-section">
+      <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">📋 Desk Audit Analysis</div><div class="section-hd-line"></div></div>
+
+      <div id="audit-reload-pill" class="audit-reload-pill" style="display:none;">
+        <span>✅ Audit data loaded</span>
+        <button class="btn btn-ghost" id="btn-audit-reload" style="padding:4px 10px;font-size:11px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="12" height="12"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
+          Load different file
+        </button>
+      </div>
+
+      <div class="audit-kpi-strip" id="audit-kpi"></div>
+
+      <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">👤 Auditor Performance</div><div class="section-hd-line"></div></div>
+      <div class="auditor-grid" id="audit-auditor-grid"></div>
+
+      <div class="cg">
+        <div class="card c4">
+          <div class="ch"><div class="ch-icon" style="background:var(--accent2-lt);">✅</div><div class="ch-title">Pass / Fail by Area</div></div>
+          <div class="cb cch" style="height:230px;"><canvas id="audit-chart-area"></canvas></div>
+        </div>
+        <div class="card c4">
+          <div class="ch"><div class="ch-icon" style="background:var(--teal-lt);">🖥</div><div class="ch-title">Setup Type Distribution</div></div>
+          <div class="cb cch" style="height:230px;"><canvas id="audit-chart-setup"></canvas></div>
+        </div>
+        <div class="card c4">
+          <div class="ch"><div class="ch-icon" style="background:var(--purple-lt);">🏢</div><div class="ch-title">Desks per Building</div></div>
+          <div class="cb cch" style="height:230px;"><canvas id="audit-chart-building"></canvas></div>
+        </div>
+      </div>
+      <div class="cg">
+        <div class="card c6">
+          <div class="ch"><div class="ch-icon" style="background:var(--warn-lt);">🖥</div><div class="ch-title">Monitor State</div></div>
+          <div class="cb cch" style="height:200px;"><canvas id="audit-chart-monitor"></canvas></div>
+        </div>
+        <div class="card c6">
+          <div class="ch"><div class="ch-icon" style="background:var(--pink-lt);">🔌</div><div class="ch-title">Docking Station Presence</div></div>
+          <div class="cb cch" style="height:200px;"><canvas id="audit-chart-dock"></canvas></div>
+        </div>
+      </div>
+
+      <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">⚠️ Issues &amp; Accessories Found</div><div class="section-hd-line"></div></div>
+      <div class="cg">
+        <div class="card c6">
+          <div class="ch"><div class="ch-icon" style="background:var(--warn-lt);">🏷</div><div class="ch-title">Sticker Issues (top findings)</div></div>
+          <div class="cb" id="audit-sticker-bars" style="max-height:220px;overflow-y:auto;"></div>
+        </div>
+        <div class="card c6">
+          <div class="ch"><div class="ch-icon" style="background:var(--accent-lt);">📦</div><div class="ch-title">Accessories Found</div></div>
+          <div class="cb" id="audit-acc-bars" style="max-height:220px;overflow-y:auto;"></div>
+        </div>
+      </div>
+
+      <div class="section-hd"><div class="section-hd-line"></div><div class="section-hd-lbl">🗂 Audit Records</div><div class="section-hd-line"></div></div>
+      <div class="card" style="width:100%;">
+        <div class="ch">
+          <div class="ch-icon" style="background:var(--surface3);">🗂</div>
+          <div class="ch-title">All Audit Records</div>
+          <div class="ch-sub" id="audit-table-count"></div>
+        </div>
+        <div class="adt-wrap">
+          <table class="adt">
+            <thead>
+              <tr>
+                <th>Auditor</th><th>Date &amp; Time</th><th>Desk Location</th>
+                <th>Building</th><th>Area</th><th>Result</th>
+                <th>Setup Type</th><th>Monitors</th><th>Monitor State</th>
+                <th>Docking Station</th><th>Sticker Issues</th><th>Accessories</th>
+              </tr>
+            </thead>
+            <tbody id="audit-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /#audit-section -->
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+
+<!-- EXPLAIN MODAL -->
+<div id="explain-backdrop" class="explain-backdrop" style="display:none;">
+  <div class="explain-modal">
+    <button class="em-close" id="em-close-btn">×</button>
+    <div class="explain-tag" id="em-tag">CHART</div>
+    <h3 id="em-title">Chart Title</h3>
+    <p  id="em-body"></p>
+    <ul id="em-tips"></ul>
+  </div>
+</div>
+
+<!-- COMPARE PERIODS MODAL -->
+<div id="compare-backdrop" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(12,21,38,.55);backdrop-filter:blur(8px);overflow-y:auto;padding:24px 16px;">
+  <div id="compare-modal" style="background:var(--surface);border-radius:18px;max-width:1080px;width:100%;margin:0 auto;box-shadow:var(--sh-lg);overflow:hidden;border:1px solid var(--border);animation:slideUp .22s cubic-bezier(.34,1.4,.64,1);">
+    <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--surface2);">
+      <div style="width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--accent-lt);color:var(--accent);font-size:18px;flex-shrink:0;">📊</div>
+      <div style="flex:1;min-width:0;">
+        <h3 style="font-size:15px;font-weight:800;letter-spacing:-.02em;color:var(--text);margin:0;">Period Comparison</h3>
+        <p style="font-size:12px;color:var(--text3);margin:2px 0 0;">Tickets, SLA breaches, avg EOS hours &amp; lifespan over time. Respects active filters.</p>
+      </div>
+      <div id="cp-seg" style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:3px;">
+        <button class="cp-seg-btn" data-gran="week">Weeks</button>
+        <button class="cp-seg-btn" data-gran="month">Months</button>
+        <button class="cp-seg-btn" data-gran="year">Years</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <label for="cp-count" style="font-size:11px;font-weight:700;color:var(--text3);">Last</label>
+        <input type="number" id="cp-count" min="1" max="104" value="12" style="width:58px;padding:6px 8px;border:1px solid var(--border2);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--sans);font-size:12px;font-weight:700;text-align:center;">
+        <span id="cp-count-unit" style="font-size:11px;font-weight:700;color:var(--text3);">months</span>
+      </div>
+      <button class="em-close" id="cp-close-btn" style="position:static;flex-shrink:0;">×</button>
+    </div>
+    <div style="padding:18px 24px 24px;">
+      <div id="cp-empty" style="display:none;text-align:center;color:var(--text3);font-size:13px;padding:40px 0;">No resolved-date data available for the current filters.</div>
+      <div id="cp-content">
+        <div class="cp-kpi-strip" id="cp-kpi-strip"></div>
+        <div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+          <div class="cb cch" style="height:240px;"><canvas id="cp-chart-volume"></canvas></div>
+          <div class="cb cch" style="height:240px;"><canvas id="cp-chart-sla"></canvas></div>
+        </div>
+        <div style="margin-top:18px;overflow-x:auto;">
+          <table id="cp-table" style="width:100%;border-collapse:collapse;font-size:12.5px;"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET DETAIL MODAL -->
+<div id="ticket-modal-backdrop" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(12,21,38,.6);backdrop-filter:blur(8px);overflow-y:auto;padding:24px 16px;">
+  <div id="ticket-modal" style="background:var(--surface);border-radius:18px;max-width:740px;width:100%;margin:0 auto;box-shadow:var(--sh-lg);overflow:hidden;border:1px solid var(--border);animation:slideUp .22s cubic-bezier(.34,1.4,.64,1);">
+    <div id="tm-header" style="padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px;background:var(--surface2);">
+      <div id="tm-sev-badge" style="width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <a id="tm-id" href="#" target="_blank" style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;">#—</a>
+          <span id="tm-status-badge"    style="border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;"></span>
+          <span id="tm-sla-badge"       style="border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;"></span>
+          <span id="tm-lifespan-badge"  style="display:none;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;"></span>
+        </div>
+        <div id="tm-title" style="font-size:13px;font-weight:600;color:var(--text);margin-top:4px;line-height:1.4;"></div>
+      </div>
+      <button id="tm-close-btn" style="background:var(--surface3);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:18px;color:var(--text3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;">×</button>
+    </div>
+    <div id="tm-body" style="padding:20px 22px 24px;display:flex;flex-direction:column;gap:20px;max-height:78vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- CITY DETAIL MODAL -->
+<style>
+#city-modal-backdrop { display:none; }
+#cm-map-header { position:relative; flex-shrink:0; }
+/* City info pill over the map */
+#cm-city-pill {
+  position:absolute; bottom:14px; left:16px; z-index:400;
+  background:rgba(255,255,255,.92); backdrop-filter:blur(12px);
+  border-radius:14px; padding:10px 16px; box-shadow:0 4px 20px rgba(0,0,0,.22);
+  display:flex; align-items:center; gap:12px; pointer-events:none;
+  border:1px solid rgba(255,255,255,.8);
+}
+#cm-city-pill .pill-icon {
+  width:38px; height:38px; border-radius:11px; display:flex;
+  align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+}
+#cm-city-pill .pill-name { font-size:17px; font-weight:800; letter-spacing:-.02em; color:#0c1526; line-height:1.1; }
+#cm-city-pill .pill-sub  { font-size:11px; color:#46527a; margin-top:2px; font-family:var(--mono); }
+/* Search box */
+#cm-search-wrap {
+  position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:400;
+  display:flex; gap:6px; width:min(360px, calc(100% - 100px));
+}
+#cm-search-input {
+  flex:1; padding:8px 14px; border-radius:10px; border:none;
+  background:rgba(255,255,255,.95); backdrop-filter:blur(12px);
+  box-shadow:0 2px 12px rgba(0,0,0,.2); font-size:13px; font-family:var(--sans);
+  color:#0c1526; outline:none;
+}
+#cm-search-input::placeholder { color:#8a95b8; }
+#cm-search-btn {
+  padding:8px 14px; border-radius:10px; border:none; cursor:pointer;
+  background:var(--accent); color:#fff; font-size:13px; font-weight:600;
+  box-shadow:0 2px 10px rgba(26,115,232,.4); transition:background .15s; white-space:nowrap;
+  font-family:var(--sans);
+}
+#cm-search-btn:hover { background:#3451d1; }
+/* Close btn */
+#cm-close-btn {
+  position:absolute; top:12px; right:12px; z-index:400;
+  background:rgba(255,255,255,.92); backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.7); border-radius:10px;
+  width:36px; height:36px; cursor:pointer; font-size:20px; color:#46527a;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.18); transition:all .15s; line-height:1;
+}
+#cm-close-btn:hover { background:#fff; color:#0c1526; }
+/* White body */
+#cm-body {
+  background:var(--surface); overflow-y:auto; flex:1;
+  padding:24px 28px 28px; display:flex; flex-direction:column; gap:20px;
+}
+/* KPI row */
+.cm-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.cm-kpi-card {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:14px; padding:18px 12px; text-align:center;
+}
+.cm-kpi-val { font-size:26px; font-weight:800; font-family:var(--mono); line-height:1; }
+.cm-kpi-lbl { font-size:10px; color:var(--text3); margin-top:6px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; }
+/* Section label */
+.cm-sec-lbl { font-size:10px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+/* Building pills */
+.cm-building-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:9px; padding:6px 14px; font-size:12px; font-weight:700;
+  color:var(--text); font-family:var(--mono);
+}
+.cm-building-pill .pill-count {
+  font-size:10px; font-weight:700; color:#fff;
+  border-radius:5px; padding:1px 7px;
+}
+/* People rows */
+.cm-person-row {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; background:var(--surface2);
+  border:1px solid var(--border); border-radius:14px;
+}
+.cm-person-name { font-size:13px; font-weight:700; color:var(--text); font-family:var(--mono); }
+.cm-badge {
+  font-size:10px; font-weight:700; border-radius:6px; padding:2px 9px;
+  border:1px solid transparent;
+}
+.cm-progress-track {
+  height:5px; background:var(--surface3); border-radius:5px; overflow:hidden; margin-top:6px;
+}
+.cm-progress-fill { height:100%; border-radius:5px; }
+</style>
+<div id="city-modal-backdrop" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(8,14,30,.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px 20px;">
+  <div id="cm-modal" style="border-radius:22px;max-width:1100px;width:100%;max-height:92vh;margin:auto;box-shadow:0 40px 100px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);overflow:hidden;animation:slideUp .26s cubic-bezier(.34,1.4,.64,1);display:flex;flex-direction:column;">
+    <!-- Compact gradient header (map removed) -->
+    <div id="cm-map-header" style="height:auto;background:linear-gradient(135deg,#1a2744,#0c1526);padding:22px 24px;">
+      <!-- City info pill -->
+      <div id="cm-city-pill" style="position:static;background:transparent;box-shadow:none;padding:0;">
+        <div class="cm-pin-icon pill-icon" style="background:linear-gradient(135deg,#d93025,#f97316);">📍</div>
+        <div>
+          <div id="cm-city-name" class="pill-name" style="color:#fff;"></div>
+          <div id="cm-city-sub"  class="pill-sub" style="color:#9db0d6;"></div>
+        </div>
+      </div>
+      <!-- Hidden search field kept for JS compatibility -->
+      <input id="cm-search-input" type="hidden"/>
+      <button id="cm-search-btn" style="display:none;"></button>
+      <!-- Close -->
+      <button id="cm-close-btn">×</button>
+    </div>
+    <!-- White body -->
+    <div id="cm-body"></div>
+  </div>
+</div>
+
+<!-- VENDOR LIBS via CDN -->
+<script src="xlsx.full.min.js"></script>
+
+<script src="chart.min.js"></script>
+<!-- APP SCRIPTS — local, in this folder -->
+<script src="analytics.js"></script>
+<!-- PRO ENHANCEMENT LAYER — wraps render(), adds advanced charts + motion. Must load AFTER analytics.js -->
+<script src="analytics-pro.js"></script>
+
+</body>
+</html>
